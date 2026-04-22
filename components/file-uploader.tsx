@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useEdgeStore } from "@/lib/edgestore";
+import { createOneTimeUrl } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -76,7 +77,9 @@ export function FileUploader() {
             onProgressChange: (progress) =>
               updateFile(entry.id, { progress }),
           });
-          updateFile(entry.id, { status: "done", url: res.url, progress: 100 });
+          const token = await createOneTimeUrl(res.url);
+          const oneTimeUrl = `${window.location.origin}/api/file/${token}`;
+          updateFile(entry.id, { status: "done", url: oneTimeUrl, progress: 100 });
         } catch {
           updateFile(entry.id, { status: "error" });
         }
